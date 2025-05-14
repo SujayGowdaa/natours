@@ -10,7 +10,7 @@ const tours = JSON.parse(
 
 app.get('/api/v1/tours', (req, res) => {
   res.status(200).json({
-    status: 'Success',
+    status: 'success',
     results: tours.length,
     data: {
       tours,
@@ -27,7 +27,7 @@ app.get('/api/v1/tours/:id', (req, res) => {
     });
   } else {
     res.status(200).json({
-      message: 'Success',
+      message: 'success',
       data: {
         tour,
       },
@@ -48,11 +48,66 @@ app.post('/api/v1/tours', (req, res) => {
   );
 
   res.status(201).json({
-    message: 'Success',
+    message: 'success',
     data: {
       tour: newTour,
     },
   });
+});
+
+app.patch('/api/v1/tours/:id', (req, res) => {
+  const tour = tours.find((tour) => tour.id === Number(req.params.id));
+
+  if (!tour) {
+    res.status(404).json({
+      message: 'No data: Please use a different ID',
+    });
+  } else {
+    const updatedTour = { ...tour, ...req.body };
+    const updatedTours = tours.map((el) =>
+      el.id === Number(req.params.id) ? updatedTour : el
+    );
+
+    fs.writeFile(
+      `${__dirname}/dev-data/data/tours-simple.json`,
+      JSON.stringify(updatedTours),
+      (err) => {
+        console.log(err);
+      }
+    );
+
+    res.status(200).json({
+      message: 'success',
+      data: {
+        tour: updatedTour,
+      },
+    });
+  }
+});
+
+app.delete('/api/v1/tours/:id', (req, res) => {
+  const tour = tours.find((tour) => tour.id === Number(req.params.id));
+
+  if (!tour) {
+    res.status(404).json({
+      message: 'No data: Please use a different ID',
+    });
+  } else {
+    const updatedTours = tours.filter((el) => el.id !== Number(req.params.id));
+
+    fs.writeFile(
+      `${__dirname}/dev-data/data/tours-simple.json`,
+      JSON.stringify(updatedTours),
+      (err) => {
+        console.log(err);
+      }
+    );
+
+    res.status(203).json({
+      message: 'success',
+      data: null,
+    });
+  }
 });
 
 const port = 3000;
