@@ -2,6 +2,8 @@ const express = require('express');
 const fs = require('fs');
 const app = express();
 
+app.use(express.json()); // is a built-in middleware function in Express.js that tells your app to automatically parse incoming JSON data from the request body.
+
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
@@ -12,6 +14,26 @@ app.get('/api/v1/tours', (req, res) => {
     results: tours.length,
     data: {
       tours,
+    },
+  });
+});
+
+app.post('/api/v1/tours', (req, res) => {
+  const newTour = { id: tours[tours.length - 1].id + 1, ...req.body };
+  tours.push(newTour);
+
+  fs.writeFile(
+    `${__dirname}/dev-data/data/tours-simple.json`,
+    JSON.stringify(tours),
+    (err) => {
+      console.log(err);
+    }
+  );
+
+  res.status(201).json({
+    message: 'Success',
+    data: {
+      tour: newTour,
     },
   });
 });
