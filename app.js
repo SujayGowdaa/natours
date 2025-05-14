@@ -18,6 +18,23 @@ app.get('/api/v1/tours', (req, res) => {
   });
 });
 
+app.get('/api/v1/tours/:id', (req, res) => {
+  const tour = tours.find((tour) => tour.id === Number(req.params.id));
+
+  if (!tour) {
+    res.status(404).json({
+      message: 'No data: Please use a different ID',
+    });
+  } else {
+    res.status(200).json({
+      message: 'Success',
+      data: {
+        tour,
+      },
+    });
+  }
+});
+
 app.post('/api/v1/tours', (req, res) => {
   const newTour = { id: tours[tours.length - 1].id + 1, ...req.body };
   tours.push(newTour);
