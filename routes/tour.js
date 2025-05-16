@@ -5,10 +5,12 @@ import {
   createTour,
   updateTour,
   deleteTour,
+  checkId,
 } from '../controllers/tour.js';
 
 const toursRouter = express.Router();
 
+toursRouter.param('id', checkId);
 toursRouter.route('/').get(getAllTours).post(createTour);
 toursRouter.route('/:id').get(getTour).patch(updateTour).delete(deleteTour);
 

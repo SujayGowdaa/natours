@@ -2,6 +2,18 @@ import fs from 'fs';
 
 const tours = JSON.parse(fs.readFileSync(`./dev-data/data/tours-simple.json`));
 
+function checkId(req, res, next, val) {
+  const tour = tours.find((tour) => tour.id === Number(req.params.id));
+  if (!tour) {
+    res.status(404).json({
+      message: 'No data: Please use a different ID',
+    });
+  }
+
+  next();
+  console.log(`Id is: ${val}`);
+}
+
 function getAllTours(req, res) {
   res.status(200).json({
     status: 'success',
@@ -15,18 +27,12 @@ function getAllTours(req, res) {
 function getTour(req, res) {
   const tour = tours.find((tour) => tour.id === Number(req.params.id));
 
-  if (!tour) {
-    res.status(404).json({
-      message: 'No data: Please use a different ID',
-    });
-  } else {
-    res.status(200).json({
-      message: 'success',
-      data: {
-        tour,
-      },
-    });
-  }
+  res.status(200).json({
+    message: 'success',
+    data: {
+      tour,
+    },
+  });
 }
 
 function createTour(req, res) {
@@ -52,56 +58,42 @@ function createTour(req, res) {
 function updateTour(req, res) {
   const tour = tours.find((tour) => tour.id === Number(req.params.id));
 
-  if (!tour) {
-    res.status(404).json({
-      message: 'No data: Please use a different ID',
-    });
-  } else {
-    const updatedTour = { ...tour, ...req.body };
-    const updatedTours = tours.map((el) =>
-      el.id === Number(req.params.id) ? updatedTour : el
-    );
+  const updatedTour = { ...tour, ...req.body };
+  const updatedTours = tours.map((el) =>
+    el.id === Number(req.params.id) ? updatedTour : el
+  );
 
-    fs.writeFile(
-      `./dev-data/data/tours-simple.json`,
-      JSON.stringify(updatedTours),
-      (err) => {
-        console.log(err);
-      }
-    );
+  fs.writeFile(
+    `./dev-data/data/tours-simple.json`,
+    JSON.stringify(updatedTours),
+    (err) => {
+      console.log(err);
+    }
+  );
 
-    res.status(200).json({
-      message: 'success',
-      data: {
-        tour: updatedTour,
-      },
-    });
-  }
+  res.status(200).json({
+    message: 'success',
+    data: {
+      tour: updatedTour,
+    },
+  });
 }
 
 function deleteTour(req, res) {
-  const tour = tours.find((tour) => tour.id === Number(req.params.id));
+  const updatedTours = tours.filter((el) => el.id !== Number(req.params.id));
 
-  if (!tour) {
-    res.status(404).json({
-      message: 'No data: Please use a different ID',
-    });
-  } else {
-    const updatedTours = tours.filter((el) => el.id !== Number(req.params.id));
+  fs.writeFile(
+    `./dev-data/data/tours-simple.json`,
+    JSON.stringify(updatedTours),
+    (err) => {
+      console.log(err);
+    }
+  );
 
-    fs.writeFile(
-      `./dev-data/data/tours-simple.json`,
-      JSON.stringify(updatedTours),
-      (err) => {
-        console.log(err);
-      }
-    );
-
-    res.status(203).json({
-      message: 'success',
-      data: null,
-    });
-  }
+  res.status(203).json({
+    message: 'success',
+    data: null,
+  });
 }
 
-export { getAllTours, getTour, createTour, updateTour, deleteTour };
+export { checkId, getAllTours, getTour, createTour, updateTour, deleteTour };
