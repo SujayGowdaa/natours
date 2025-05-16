@@ -1,11 +1,13 @@
-const express = require('express');
-const fs = require('fs');
-const morgan = require('morgan');
+import express from 'express';
+import morgan from 'morgan';
+import toursRouter from './routes/tour.js';
+import userRouter from './routes/user.js';
 
 const app = express();
 
-// 1. Middlewares
+// 1. Common Middlewares
 app.use(morgan('dev'));
+
 app.use(express.json()); // is a built-in middleware function in Express.js that tells your app to automatically parse incoming JSON data from the request body.
 
 app.use((req, res, next) => {
@@ -13,123 +15,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// 2. Route Handlers
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
-);
+// 2. Routes and Route Handlers
+app.use('/api/v1/tours', toursRouter);
+app.use('/api/v1/users', userRouter);
 
-function getAllTours(req, res) {
-  res.status(200).json({
-    status: 'success',
-    results: tours.length,
-    data: {
-      tours,
-    },
-  });
-}
-
-function getTour(req, res) {
-  const tour = tours.find((tour) => tour.id === Number(req.params.id));
-
-  if (!tour) {
-    res.status(404).json({
-      message: 'No data: Please use a different ID',
-    });
-  } else {
-    res.status(200).json({
-      message: 'success',
-      data: {
-        tour,
-      },
-    });
-  }
-}
-
-function createTour(req, res) {
-  const newTour = { id: tours[tours.length - 1].id + 1, ...req.body };
-  tours.push(newTour);
-
-  fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    (err) => {
-      console.log(err);
-    }
-  );
-
-  res.status(201).json({
-    message: 'success',
-    data: {
-      tour: newTour,
-    },
-  });
-}
-
-function updateTour(req, res) {
-  const tour = tours.find((tour) => tour.id === Number(req.params.id));
-
-  if (!tour) {
-    res.status(404).json({
-      message: 'No data: Please use a different ID',
-    });
-  } else {
-    const updatedTour = { ...tour, ...req.body };
-    const updatedTours = tours.map((el) =>
-      el.id === Number(req.params.id) ? updatedTour : el
-    );
-
-    fs.writeFile(
-      `${__dirname}/dev-data/data/tours-simple.json`,
-      JSON.stringify(updatedTours),
-      (err) => {
-        console.log(err);
-      }
-    );
-
-    res.status(200).json({
-      message: 'success',
-      data: {
-        tour: updatedTour,
-      },
-    });
-  }
-}
-
-function deleteTour(req, res) {
-  const tour = tours.find((tour) => tour.id === Number(req.params.id));
-
-  if (!tour) {
-    res.status(404).json({
-      message: 'No data: Please use a different ID',
-    });
-  } else {
-    const updatedTours = tours.filter((el) => el.id !== Number(req.params.id));
-
-    fs.writeFile(
-      `${__dirname}/dev-data/data/tours-simple.json`,
-      JSON.stringify(updatedTours),
-      (err) => {
-        console.log(err);
-      }
-    );
-
-    res.status(203).json({
-      message: 'success',
-      data: null,
-    });
-  }
-}
-
-// 3. Routes
-app.route('/api/v1/tours').get(getAllTours).post(createTour);
-app
-  .route('/api/v1/tours/:id')
-  .get(getTour)
-  .patch(updateTour)
-  .delete(deleteTour);
-
-// 4. Server
-const port = 3000;
-app.listen(port, () => {
-  console.log(`Running on port ${port}...`);
-});
+export default app;
