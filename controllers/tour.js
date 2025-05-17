@@ -14,6 +14,16 @@ function checkId(req, res, next, val) {
   console.log(`Id is: ${val}`);
 }
 
+function checkBody(req, res, next) {
+  if (!req.body.name || !req.body.price) {
+    res.status(400).json({
+      status: 'failed',
+      message: 'Name and Price fields are mandatory.',
+    });
+  }
+  next();
+}
+
 function getAllTours(req, res) {
   res.status(200).json({
     status: 'success',
@@ -96,4 +106,12 @@ function deleteTour(req, res) {
   });
 }
 
-export { checkId, getAllTours, getTour, createTour, updateTour, deleteTour };
+export {
+  checkId,
+  checkBody,
+  getAllTours,
+  getTour,
+  createTour,
+  updateTour,
+  deleteTour,
+};
