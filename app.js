@@ -7,8 +7,8 @@ const app = express();
 
 // 1. Common Middlewares
 app.use(morgan('dev'));
-
 app.use(express.json()); // is a built-in middleware function in Express.js that tells your app to automatically parse incoming JSON data from the request body.
+app.use(express.static('./public/')); // It allows users to access public files in the browser directly by URL, without needing a route for each one.
 
 app.use((req, res, next) => {
   console.log('Hello from middleware 👋');
