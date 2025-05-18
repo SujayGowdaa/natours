@@ -1,15 +1,35 @@
 import Tour from '../models/tour.js';
 
-function getAllTours(req, res) {
-  res.status(200).json({
-    status: 'success',
-  });
+async function getAllTours(req, res) {
+  try {
+    const tours = await Tour.find();
+    res.status(200).json({
+      status: 'success',
+      data: { tours },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'failed',
+      message: err,
+    });
+  }
 }
 
-function getTour(req, res) {
-  res.status(200).json({
-    message: 'success',
-  });
+async function getTour(req, res) {
+  try {
+    const tour = await Tour.findById(req.params.id);
+    res.status(200).json({
+      message: 'success',
+      data: {
+        tour,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'failed',
+      message: err,
+    });
+  }
 }
 
 async function createTour(req, res) {
@@ -23,21 +43,20 @@ async function createTour(req, res) {
       },
     });
   } catch (err) {
-    console.log(err);
-    res.status(400).json({
+    res.status(404).json({
       status: 'failed',
-      message: 'failed to create a tour.',
+      message: err,
     });
   }
 }
 
-function updateTour(req, res) {
+async function updateTour(req, res) {
   res.status(200).json({
     message: 'success',
   });
 }
 
-function deleteTour(req, res) {
+async function deleteTour(req, res) {
   res.status(203).json({
     message: 'success',
     data: null,
