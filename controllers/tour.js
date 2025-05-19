@@ -85,5 +85,5 @@ async function deleteTour(req, res) {
     });
   }
 }
-
+// export all the functions
 export { getAllTours, getTour, createTour, updateTour, deleteTour };
