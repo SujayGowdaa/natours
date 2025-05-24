@@ -1,8 +1,12 @@
 import Tour from '../models/tour.js';
 
 async function getAllTours(req, res) {
+  const queryObj = { ...req.query };
+  const excudedFields = ['limit', 'page', 'sort', 'fields'];
+  excudedFields.forEach((el) => delete queryObj[el]);
+
   try {
-    const tours = await Tour.find();
+    const tours = await Tour.find(queryObj);
     res.status(200).json({
       status: 'success',
       data: { tours },
