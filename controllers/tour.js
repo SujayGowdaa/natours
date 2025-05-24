@@ -1,12 +1,22 @@
 import Tour from '../models/tour.js';
 
 async function getAllTours(req, res) {
-  const queryObj = { ...req.query };
-  const excudedFields = ['limit', 'page', 'sort', 'fields'];
-  excudedFields.forEach((el) => delete queryObj[el]);
-
   try {
-    const tours = await Tour.find(queryObj);
+    const queryObj = { ...req.query };
+    const excudedFields = ['limit', 'page', 'sort', 'fields'];
+    excudedFields.forEach((el) => delete queryObj[el]);
+
+    let query = Tour.find(queryObj);
+
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort('-createdAt');
+    }
+
+    const tours = await query;
+
     res.status(200).json({
       status: 'success',
       data: { tours },
