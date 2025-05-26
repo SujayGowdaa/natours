@@ -128,5 +128,66 @@ async function deleteTour(req, res) {
     });
   }
 }
+
+async function getTourStats(req, res) {
+  try {
+    const stats = await Tour.aggregate([
+      {
+        $match: {
+          ratingAverage: {
+            $gte: 4.5,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: '$difficulty',
+          numTours: {
+            $sum: 1,
+          },
+          numRatings: {
+            $sum: '$ratingQuantity',
+          },
+          avgRating: {
+            $avg: '$ratingAverage',
+          },
+          avgPrice: {
+            $avg: '$price',
+          },
+          minPrice: {
+            $min: '$price',
+          },
+          maxPrice: {
+            $max: '$price',
+          },
+        },
+      },
+      {
+        $sort: {
+          avgPrice: 1,
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      message: 'success',
+      data: stats,
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+}
+
 // export all the functions
-export { getAllTours, getTour, createTour, updateTour, deleteTour, getTopFive };
+export {
+  getAllTours,
+  getTour,
+  createTour,
+  updateTour,
+  deleteTour,
+  getTopFive,
+  getTourStats,
+};
