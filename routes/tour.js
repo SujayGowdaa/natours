@@ -12,8 +12,8 @@ import {
 const toursRouter = express.Router();
 
 toursRouter.route('/top-5-tours').get(getTopFive, getAllTours);
-toursRouter.route('/tour-stats').get(getTourStats);
 toursRouter.route('/').get(getAllTours).post(createTour);
 toursRouter.route('/:id').get(getTour).patch(updateTour).delete(deleteTour);
+toursRouter.route('/tour-stats').get(getTourStats);
 
 export default toursRouter;
