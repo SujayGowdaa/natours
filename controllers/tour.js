@@ -1,10 +1,17 @@
 import Tour from '../models/tour.js';
 
+async function getTopFive(req, res, next) {
+  req.url =
+    '?limit=5&sort=-ratingsAverage,price&fields=name,price,ratingsAverage,difficulty,summary';
+
+  next();
+}
+
 async function getAllTours(req, res) {
   try {
     const queryObj = { ...req.query };
-    const excudedFields = ['limit', 'page', 'sort', 'fields'];
-    excudedFields.forEach((el) => delete queryObj[el]);
+    const excludedFields = ['limit', 'page', 'sort', 'fields'];
+    excludedFields.forEach((el) => delete queryObj[el]);
 
     let query = Tour.find(queryObj);
 
@@ -46,7 +53,7 @@ async function getAllTours(req, res) {
   } catch (err) {
     res.status(404).json({
       status: 'fail',
-      message: err,
+      message: err.message,
     });
   }
 }
@@ -122,4 +129,4 @@ async function deleteTour(req, res) {
   }
 }
 // export all the functions
-export { getAllTours, getTour, createTour, updateTour, deleteTour };
+export { getAllTours, getTour, createTour, updateTour, deleteTour, getTopFive };
