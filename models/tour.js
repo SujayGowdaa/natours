@@ -55,6 +55,10 @@ const tourSchema = new mongoose.Schema(
       select: false,
     },
     startDates: [Date],
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: {
@@ -87,6 +91,20 @@ tourSchema.pre('save', function (next) {
 //   console.log(doc);
 //   next();
 // });
+
+// tourSchema.pre('find', function (next) {
+tourSchema.pre(/^find/, function (next) {
+  // use regular expression /^find/ to run for every method that start with name 'find'
+  this.find({ secretTour: { $ne: true } });
+  this.start = Date.now();
+  next();
+});
+
+tourSchema.post(/^find/, function (docs, next) {
+  this.start = Date.now() - this.start;
+  console.log(this.start);
+  next();
+});
 
 const Tour = mongoose.model('Tour', tourSchema);
 
