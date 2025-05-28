@@ -80,18 +80,20 @@ tourSchema.pre('save', function (next) {
   next();
 });
 
-// // Document middleware: Runs before document .save() and .create() method.
+// Document Middleware
+// // Runs before document .save() and .create() method.
 // tourSchema.pre('save', function (next) {
 //   console.log('Will save document...');
 //   next();
 // });
 
-// // Document middleware: Runs after document .save() and .create() method.
+// // Runs after document .save() and .create() method.
 // tourSchema.post('save', function (doc, next) {
 //   console.log(doc);
 //   next();
 // });
 
+// Query Middleware
 // tourSchema.pre('find', function (next) {
 tourSchema.pre(/^find/, function (next) {
   // use regular expression /^find/ to run for every method that start with name 'find'
@@ -103,6 +105,17 @@ tourSchema.pre(/^find/, function (next) {
 tourSchema.post(/^find/, function (docs, next) {
   this.start = Date.now() - this.start;
   console.log(this.start);
+  next();
+});
+
+// Aggregation Middleware
+tourSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({
+    $match: {
+      $ne: true,
+    },
+  });
+
   next();
 });
 
